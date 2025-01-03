@@ -49,9 +49,16 @@ export class TriviaService {
     return trivia;
   }
 
-  async getTriviaByTopic(topicId: number): Promise<Trivia[]> {
+  async getTriviaByTopicId(topicId: number): Promise<Trivia[]> {
     return this.triviaRepository.find({
       where: { topic: { id: topicId } },
     });
+  }
+
+  async getTriviaByTopicName(topicName: string): Promise<Trivia[]> {
+    const topic = await this.topicRepository.findOneBy({ name: topicName });
+    console.log(topic, topicName);
+    if (!topic) return [];
+    return this.getTriviaByTopicId(topic.id);
   }
 }

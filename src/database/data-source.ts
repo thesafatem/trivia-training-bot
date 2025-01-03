@@ -5,7 +5,7 @@ export const AppDataSource = new DataSource({
   type: 'sqlite',
   database: 'database.sqlite',
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [Topic, Trivia],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
