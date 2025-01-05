@@ -14,7 +14,11 @@ import { getRedisConfig } from './config/redis.config';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     BotModule,
-    TypeOrmModule.forRoot(typeOrmConfig),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: typeOrmConfig,
+    }),
     TypeOrmModule.forFeature([Topic, Trivia]),
     CacheModule.registerAsync({
       imports: [ConfigModule],

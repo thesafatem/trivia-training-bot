@@ -31,9 +31,9 @@
     "cache-manager": "^5.7.6",
     "cache-manager-redis-store": "^3.0.1",
     "node-telegram-bot-api": "^0.66.0",
+    "pg": "^8.13.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "sqlite3": "^5.1.7",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
@@ -44,6 +44,7 @@
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
     "@types/node-telegram-bot-api": "^0.64.7",
+    "@types/sqlite3": "^3.1.11",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",
@@ -76,8 +77,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "engines": {
-    "node": "22.x"
   }
 }
