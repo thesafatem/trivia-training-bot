@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Topic } from './topic.entity';
 
-@Entity()
+@Entity('trivia')
 export class Trivia {
   @PrimaryGeneratedColumn()
   id: number;

@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
 import { Topic, Trivia } from './trivia/entities';
 import { TriviaService } from './trivia/trivia.service';
 import { typeOrmConfig } from './config/typeorm.config';
@@ -9,6 +7,7 @@ import { BotModule } from './bot/bot.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { getRedisConfig } from './config/redis.config';
+import { TriviaInitializationService } from './database/trivia-initialization.service';
 
 @Module({
   imports: [
@@ -27,7 +26,6 @@ import { getRedisConfig } from './config/redis.config';
       isGlobal: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, TriviaService],
+  providers: [TriviaService, TriviaInitializationService],
 })
 export class AppModule {}
