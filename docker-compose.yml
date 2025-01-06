@@ -11,6 +11,8 @@ services:
       - postgres
     volumes:
       - .:/app
+      - /app/node_modules
+    restart: always
 
   redis:
     image: redis:latest

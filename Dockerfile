@@ -1,10 +1,10 @@
-# Use Node.js as the base image
+# Use the official Node.js image as the base image
 FROM node:20
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
 # Install dependencies
@@ -12,8 +12,11 @@ RUN npm install
 
 RUN npm install -g @nestjs/cli
 
-# Copy the rest of the app's source code
+# Copy the rest of the application code to the container
 COPY . .
 
-# Define the default command to start the app
-CMD ["npm", "start"]
+# Build the application
+RUN npm run build
+
+# Command to start the application
+CMD ["npm", "run", "start:prod"]
