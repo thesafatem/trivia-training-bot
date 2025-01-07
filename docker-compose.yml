@@ -8,10 +8,6 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
-    volumes:
-      - .:/app
-      - /app/node_modules
     restart: always
 
   redis:
@@ -23,19 +19,5 @@ services:
       - redis_data:/data
     restart: always
 
-  postgres:
-    image: postgres:13
-    container_name: postgres_container
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: test
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
-
 volumes:
   redis_data:
-  postgres_data:
