@@ -1,10 +1,13 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { User } from 'node-telegram-bot-api';
 import { TriviaService } from '../trivia/trivia.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Trivia } from '../trivia/entities';
+import { TopicEnum } from '../trivia/entities/topic.enum';
+import { ProbabilityTrivia, TriviaState } from '../trivia/trivia-state.class';
 
 @Injectable()
 export class BotService implements OnModuleInit {
@@ -46,6 +49,25 @@ export class BotService implements OnModuleInit {
     }
   }
 
+  async getRandomTrivia(user: User, topic: TopicEnum): Promise<Trivia> {
+    const key = `${topic}_${user.id}`;
+    const triviaStateCached =
+      await this.cacheManager.get<ProbabilityTrivia[]>(key);
+    let triviaState: TriviaState;
+    if (!triviaStateCached) {
+      const trivia = await this.triviaService.getTriviaByTopicName(topic);
+      triviaState = new TriviaState(trivia);
+      triviaState.setEqualProbabilities();
+    } else {
+      triviaState = new TriviaState(triviaStateCached);
+    }
+    const randomTrivia = triviaState.getRandomTrivia();
+    console.log(triviaState.getInfo());
+    triviaState.useTrivia(randomTrivia.id);
+    await this.cacheManager.set(key, triviaState.getTrivia());
+    return randomTrivia;
+  }
+
   onModuleInit() {
     const token = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
 
@@ -55,18 +77,18 @@ export class BotService implements OnModuleInit {
       await this.sendAnswerOnLastTriviaCall(msg);
 
       try {
-        const trivia =
-          await this.triviaService.getTriviaByTopicName('african_capitals');
+        const randomTrivia = await this.getRandomTrivia(
+          msg.from,
+          TopicEnum.AfricanCapitals,
+        );
 
-        if (!trivia || !Array.isArray(trivia) || trivia.length === 0) {
+        if (!randomTrivia) {
           await this.bot.sendMessage(
             msg.chat.id,
-            'Нет данных для "african_capitals" в базе данных.',
+            'Нет данных по данному запросу.',
           );
           return;
         }
-
-        const randomTrivia = trivia[Math.floor(Math.random() * trivia.length)];
 
         const cacheKey = String(msg.from.id);
 
@@ -74,7 +96,7 @@ export class BotService implements OnModuleInit {
 
         await this.bot.sendMessage(msg.chat.id, randomTrivia.question);
       } catch (error) {
-        console.error('Error fetching African capital:', error);
+        console.log(error);
         await this.bot.sendMessage(
           msg.chat.id,
           'Произошла ошибка при обработке команды.',

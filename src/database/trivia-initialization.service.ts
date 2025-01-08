@@ -2,6 +2,7 @@ import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { TriviaService } from '../trivia/trivia.service';
 import { Trivia } from '../trivia/entities';
 import * as africanCountries from './seeders/african-capitals.json';
+import { TopicEnum } from '../trivia/entities/topic.enum';
 
 @Injectable()
 export class TriviaInitializationService implements OnApplicationBootstrap {
@@ -35,7 +36,7 @@ export class TriviaInitializationService implements OnApplicationBootstrap {
   }
 
   private async initializeAfricanCapitals() {
-    const topicName = 'african_capitals';
+    const topicName = TopicEnum.AfricanCapitals;
     const trivia = africanCountries;
     await this.initializeTopicAndTrivia(topicName, trivia);
   }
