@@ -19,7 +19,7 @@ export class BotService implements OnModuleInit {
     private readonly triviaService: TriviaService,
   ) {}
 
-  private commands = ['/african_capital'];
+  private commands = ['/african_capital', '/american_capital'];
 
   async sendAnswerOnLastTriviaCall(msg: TelegramBot.Message) {
     const cachedValue = await this.cacheManager.get<Trivia>(
@@ -62,7 +62,6 @@ export class BotService implements OnModuleInit {
       triviaState = new TriviaState(triviaStateCached);
     }
     const randomTrivia = triviaState.getRandomTrivia();
-    console.log(triviaState.getInfo());
     triviaState.useTrivia(randomTrivia.id);
     await this.cacheManager.set(key, triviaState.getTrivia());
     return randomTrivia;
@@ -80,6 +79,37 @@ export class BotService implements OnModuleInit {
         const randomTrivia = await this.getRandomTrivia(
           msg.from,
           TopicEnum.AfricanCapitals,
+        );
+
+        if (!randomTrivia) {
+          await this.bot.sendMessage(
+            msg.chat.id,
+            'Нет данных по данному запросу.',
+          );
+          return;
+        }
+
+        const cacheKey = String(msg.from.id);
+
+        await this.cacheManager.set(cacheKey, randomTrivia, 1000 * 3600 * 24);
+
+        await this.bot.sendMessage(msg.chat.id, randomTrivia.question);
+      } catch (error) {
+        console.log(error);
+        await this.bot.sendMessage(
+          msg.chat.id,
+          'Произошла ошибка при обработке команды.',
+        );
+      }
+    });
+
+    this.bot.onText(/\/american_capital/, async (msg) => {
+      await this.sendAnswerOnLastTriviaCall(msg);
+
+      try {
+        const randomTrivia = await this.getRandomTrivia(
+          msg.from,
+          TopicEnum.AmericanCapitals,
         );
 
         if (!randomTrivia) {
